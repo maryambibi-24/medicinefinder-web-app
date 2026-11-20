@@ -1,0 +1,51 @@
+.dash { min-height: 100vh; background: #f3f6fa; font-family: Inter, system-ui, sans-serif; color: #0b2a55; }
+.dash-bar { display: flex; align-items: center; gap: 14px; background: #0b2a55; color: #fff; padding: 12px 32px; }
+.dash-bar .logo-name { font-size: 22px; }
+.dash-tag { background: #1d4ed8; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.dash-user { margin-left: auto; color: #d6e4fb; font-size: 14px; }
+.dash-out { background: transparent; color: #fff; border: 1px solid #7aa2e6; border-radius: 8px; padding: 8px 14px; min-height: 40px; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; transition: background-color 0.2s; }
+.dash-out:hover { background: #123c7a; }
+.dash-out:focus-visible, .dash-btn:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 2px; }
+
+.dash-main { max-width: 960px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; gap: 20px; }
+.dash-main h1 { margin: 0; font-size: 28px; }
+.dash-sub { margin: 0; color: #475569; line-height: 1.5; }
+.dash-card { background: #fff; border: 1px solid #d5dde8; border-radius: 14px; padding: 24px; animation: dashRise 0.45s ease-out both; }
+.dash-card h2 { margin: 0 0 8px; font-size: 20px; }
+.dash-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.dash-tile { background: #fff; border: 1px solid #d5dde8; border-radius: 14px; padding: 20px; transition: transform 0.2s, box-shadow 0.2s; animation: dashRise 0.45s ease-out both; }
+.dash-tile:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(11, 42, 85, 0.12); }
+.dash-tile b { display: block; margin-bottom: 4px; }
+.dash-tile span { color: #475569; font-size: 14px; }
+.dash-grid .dash-tile:nth-child(2) { animation-delay: 0.08s; }
+.dash-grid .dash-tile:nth-child(3) { animation-delay: 0.16s; }
+
+.dash-badge { display: inline-block; border-radius: 999px; padding: 5px 12px; font-size: 13px; font-weight: 600; }
+.dash-badge.wait { background: #fef3c7; color: #92400e; }
+.dash-badge.ok { background: #dcfce7; color: #166534; }
+.dash-badge.no { background: #fee2e2; color: #991b1b; }
+.dash-btn { margin-top: 12px; min-height: 46px; padding: 10px 20px; border: 0; border-radius: 10px; background: #1d4ed8; color: #fff; font: 600 15px Inter, system-ui, sans-serif; cursor: pointer; transition: background-color 0.2s, transform 0.15s; }
+.dash-btn:hover:not(:disabled) { background: #1e40af; transform: translateY(-2px); }
+.dash-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.dash-btn.ghost { background: #fff; color: #1d4ed8; border: 1px solid #1d4ed8; text-decoration: none; display: inline-block; line-height: 26px; }
+
+.dash-steps { display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+.dash-steps div { display: flex; align-items: center; gap: 12px; color: #475569; }
+.dash-steps span { width: 28px; height: 28px; border-radius: 50%; background: #e6efff; color: #33507d; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+.dash-steps .done span { background: #1d4ed8; color: #fff; }
+.dash-steps .now { color: #0b2a55; font-weight: 600; }
+.dash-steps .now span { background: #fff; border: 2px solid #1d4ed8; color: #1d4ed8; animation: dashPulse 1.8s ease-out infinite; }
+.dash-steps .fail span { background: #991b1b; color: #fff; }
+
+.dash-facts { display: grid; gap: 8px 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 8px 0 0; padding: 0; list-style: none; font-size: 14px; color: #475569; }
+.dash-facts b { color: #0b2a55; }
+.dash-note { font-size: 13px; color: #475569; margin: 10px 0 0; }
+.dash-reason { background: #fee2e2; color: #7f1d1d; border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+
+@keyframes dashRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes dashPulse { 0% { box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.45); } 70%, 100% { box-shadow: 0 0 0 10px rgba(29, 78, 216, 0); } }
+@media (prefers-reduced-motion: reduce) { .dash-card, .dash-tile, .dash-steps .now span { animation: none; } .dash-tile:hover, .dash-btn:hover { transform: none; } }
+
+/* Tiles that act as links */
+a.dash-tile { color: inherit; text-decoration: none; display: block; }
+a.dash-tile:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 2px; }

@@ -9,6 +9,9 @@ app.use(cors());          // lets the React page talk to this server
 app.use(express.json());  // lets the server read JSON sent by the page
 
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/admin", require("./routes/admin"));
+app.use("/api/pharmacy", require("./routes/pharmacy"));
+app.use("/api/stock", require("./routes/stock"));
 
 app.get("/", (req, res) => res.send("MedFinder server is running"));
 
@@ -20,5 +23,6 @@ app.listen(PORT, async () => {
     console.log("Database connected");
   } catch (err) {
     console.log("Database NOT connected:", err.message);
+    console.log("Run database.sql once to create the database and tables.");
   }
 });
