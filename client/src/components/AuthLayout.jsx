@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Logo from "./Logo";
 import "./auth.css";
 
@@ -39,7 +40,7 @@ export default function AuthLayout({ title, text, aside, steps, activeStep, foot
     <div className={`auth${fancy ? " auth-fancy" : ""}`}>
       <aside className="auth-aside">
         {fancy && <Scene />}
-        <Logo />
+        <Link to="/" aria-label="MedFinder home" style={{ color: "inherit", textDecoration: "none", alignSelf: "flex-start" }}><Logo /></Link>
         <div className="auth-welcome">
           <h1>{title}</h1>
           <p>{text}</p>

@@ -5,7 +5,7 @@ import AuthLayout from "../components/AuthLayout";
 import useNoAutofill from "../hooks/useNoAutofill";
 
 const API = "http://localhost:5000/api/auth";
-
+// Everyone logs in here, then goes to their own dashboard
 const HOME = { user: "/dashboard", pharmacy: "/pharmacy", admin: "/admin" };
 
 const icon = { width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true };
@@ -44,8 +44,9 @@ export default function Login() {
       const { data } = await axios.post(`${API}/login`, { email, password });
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      setDone(true); 
-      setTimeout(() => navigate(HOME[data.user.role] || "/dashboard"), 900);
+      setDone(true); // show the success animation, then open the right dashboard
+      const from = data.user.role === "user" ? location.state?.from : null;
+      setTimeout(() => navigate(from || HOME[data.user.role] || "/dashboard"), 900);
     } catch (err) {
       setError(err.response?.data?.error || "Cannot reach the server. Try again.");
     } finally {
@@ -76,7 +77,7 @@ export default function Login() {
         </div>
 
         <h2>Log in</h2>
-        <p className="auth-sub">Login as customers, pharmacies and administrators.</p>
+        <p className="auth-sub">One login for customers, pharmacies and administrators.</p>
 
         {justRegistered && (
           <div className="alert ok" role="status">Account created. You can log in now.</div>

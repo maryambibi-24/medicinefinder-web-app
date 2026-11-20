@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import "./auth.css"; // logo styles
 import "./dash.css";
@@ -17,7 +17,7 @@ export default function DashShell({ tag, children }) {
   return (
     <div className="dash">
       <header className="dash-bar">
-        <Logo size={38} />
+        <Link to="/" aria-label="MedFinder home" style={{ color: "inherit", textDecoration: "none", display: "flex" }}><Logo size={38} /></Link>
         <span className="dash-tag">{tag}</span>
         <span className="dash-user">{user?.name}</span>
         <button className="dash-out" onClick={logout}>Sign out</button>

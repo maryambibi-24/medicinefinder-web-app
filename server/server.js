@@ -12,6 +12,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/pharmacy", require("./routes/pharmacy"));
 app.use("/api/stock", require("./routes/stock"));
+app.use("/api/search", require("./routes/search"));
 
 app.get("/", (req, res) => res.send("MedFinder server is running"));
 

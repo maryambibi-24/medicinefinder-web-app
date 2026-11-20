@@ -46,8 +46,12 @@ export default function PharmacyStock() {
       navigate("/login");
     } else if (code === 403) {
       setBlocked(true);
+    } else if (!err.response) {
+      setError("Cannot reach the server. Check that the backend is running (npm start in the server folder).");
+    } else if (code === 404 && typeof err.response.data !== "object") {
+      setError("The server does not have the stock feature yet. It is running old code: stop it with Ctrl+C, update the server files, then start it again with npm start.");
     } else {
-      setError(err.response?.data?.error || fallback);
+      setError(err.response?.data?.error || `${fallback} (error ${code})`);
     }
   }, [navigate]);
 
