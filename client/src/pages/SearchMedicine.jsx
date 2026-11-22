@@ -128,7 +128,7 @@ export default function SearchMedicine() {
             <div className="srch-price">
               {m.min_price !== null
                 ? <><small>From</small><b>{money(m.min_price)}</b></>
-                : <span className="dash-badge no">Out of stock</span>}
+                : <><span className="dash-badge no">Out of stock</span><small className="srch-altlink">See alternatives →</small></>}
             </div>
           </Link>
         ))}

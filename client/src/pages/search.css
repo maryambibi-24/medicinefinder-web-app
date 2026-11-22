@@ -54,3 +54,12 @@
 .srch-hero button { margin-top: 0; }
 
 @media (prefers-reduced-motion: reduce) { .srch-card, .srch-ph { animation: none; } .srch-card:hover { transform: none; } }
+
+/* Alternatives */
+.srch-alt { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; scroll-margin-top: 16px; }
+.srch-alt > h2 { margin: 0; font-size: 20px; }
+.srch-banner { background: #fef3c7; color: #78350f; border-radius: 12px; padding: 14px 16px; animation: dashRise 0.35s ease-out both; }
+.srch-note { color: #475569; font-size: 13px; margin: 4px 0 0; }
+.srch-altlink { color: #1d4ed8; font-weight: 600; font-size: 13px; }
+.srch-card:hover .srch-altlink { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .srch-banner { animation: none; } }

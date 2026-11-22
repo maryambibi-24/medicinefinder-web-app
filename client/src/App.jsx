@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SiteLayout from "./components/SiteLayout";
 import Home from "./pages/Home";
 import ForUsers from "./pages/ForUsers";
@@ -15,8 +15,9 @@ import MedicineDetails from "./pages/MedicineDetails";
 
 // Only lets signed-in people in. If "role" is given, only that role may enter.
 function Protected({ role, children }) {
+  const location = useLocation();
   const user = JSON.parse(localStorage.getItem("user") || "null");
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   if (role && user.role !== role) return <Navigate to="/login" />;
   return children;
 }

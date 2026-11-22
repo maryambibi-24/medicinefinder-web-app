@@ -39,6 +39,9 @@ export default function MedicineDetails() {
 
   const med = res.data?.medicine;
   const pharmacies = res.data?.pharmacies || [];
+  const alternatives = res.data?.alternatives || [];
+  const noStock = !loading && !!med && !pharmacies.some((p) => p.quantity > 0);
+  const cityQuery = city ? `?city=${encodeURIComponent(city)}` : "";
   const cheapest = pharmacies.find((p) => p.quantity > 0)?.stock_id;
   const back = `/search${city ? `?city=${encodeURIComponent(city)}` : ""}`;
 
@@ -103,6 +106,50 @@ export default function MedicineDetails() {
               );
             })}
           </div>
+
+          {(noStock || alternatives.length > 0) && (
+            <section className="srch-alt" id="alternatives" aria-labelledby="alt-title">
+              {noStock && (
+                <div className="srch-banner" role="status">
+                  <b>{med.name} is not in stock{city ? ` in ${city}` : ""} right now.</b>
+                </div>
+              )}
+              <h2 id="alt-title">{noStock ? "Try these alternatives" : "Other brands with the same ingredient"}</h2>
+              {med.generic_name && <p className="dash-sub">Same active ingredient: {med.generic_name}</p>}
+
+              {!alternatives.length && (
+                <div className="dash-card srch-empty">
+                  <b>No alternative is in stock{city ? ` in ${city}` : ""} right now.</b>
+                  <p className="dash-sub">
+                    {med.generic_name
+                      ? "Try another city, or check again later. Pharmacies update their stock during the day."
+                      : "We do not have the active ingredient for this medicine, so we cannot suggest alternatives."}
+                  </p>
+                </div>
+              )}
+
+              <div className="srch-list">
+                {alternatives.map((a) => (
+                  <Link className="srch-card" key={a.id} to={`/medicine/${a.id}${cityQuery}`}>
+                    <div className="srch-info">
+                      <h2>{a.name} <span>{a.strength}</span> <em>{a.form}</em></h2>
+                      <p className="srch-meta">
+                        <span className={`dash-badge ${a.same_pack ? "ok" : "wait"}`}>
+                          {a.same_pack ? "Same strength and form" : a.same_form ? "Different strength" : "Different form"}
+                        </span>
+                        {" "}In stock at {a.pharmacy_count} {a.pharmacy_count === 1 ? "pharmacy" : "pharmacies"}
+                      </p>
+                    </div>
+                    <div className="srch-price"><small>From</small><b>{money(a.min_price)}</b></div>
+                  </Link>
+                ))}
+              </div>
+
+              <p className="srch-note">
+                Ask a pharmacist or your doctor before switching to another medicine. Strength and form can differ.
+              </p>
+            </section>
+          )}
         </>
       )}
     </DashShell>

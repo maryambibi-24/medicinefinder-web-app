@@ -95,7 +95,37 @@ router.get("/medicine/:id", async (req, res) => {
       city ? [id, city] : [id]
     );
 
-    res.json({ medicine: meds[0], pharmacies: rows.map((r) => ({ ...r, price: Number(r.price) })) });
+    // Alternatives: other brands with the same active ingredient that are in stock
+    // at approved pharmacies (same city when a city is chosen).
+    // Same strength and form come first, then the cheapest.
+    const med = meds[0];
+    let alternatives = [];
+    if (text(med.generic_name)) {
+      const [alts] = await db.query(
+        `SELECT m.id, m.name, m.generic_name, m.form, m.strength,
+                COUNT(*) AS pharmacy_count,
+                MIN(s.price) AS min_price,
+                (m.form = ? AND m.strength = ?) AS same_pack,
+                (m.form = ?) AS same_form
+           FROM medicines m
+           JOIN stock s ON s.medicine_id = m.id AND s.quantity > 0
+           JOIN pharmacies p ON p.id = s.pharmacy_id AND p.is_verified = 1
+          WHERE m.id <> ? AND LOWER(TRIM(m.generic_name)) = LOWER(TRIM(?)) ${city ? "AND p.city = ?" : ""}
+          GROUP BY m.id
+          ORDER BY same_pack DESC, same_form DESC, MIN(s.price) ASC, m.name ASC
+          LIMIT 8`,
+        [med.form, med.strength, med.form, id, med.generic_name, ...(city ? [city] : [])]
+      );
+      alternatives = alts.map((a) => ({
+        id: a.id, name: a.name, generic_name: a.generic_name, form: a.form, strength: a.strength,
+        pharmacy_count: Number(a.pharmacy_count),
+        min_price: Number(a.min_price),
+        same_pack: Number(a.same_pack) === 1,
+        same_form: Number(a.same_form) === 1,
+      }));
+    }
+
+    res.json({ medicine: med, pharmacies: rows.map((r) => ({ ...r, price: Number(r.price) })), alternatives });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });
