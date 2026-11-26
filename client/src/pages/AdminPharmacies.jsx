@@ -99,6 +99,12 @@ export default function AdminPharmacies() {
               <p className="adm-lic">License: <b>{p.license_number}</b></p>
               <p>{p.address}, {p.city}</p>
               <p>Open {time(p.opening_time)} to {time(p.closing_time)}</p>
+              <p>
+                Location:{" "}
+                {p.latitude !== null
+                  ? <a href={`https://www.google.com/maps?q=${p.latitude},${p.longitude}`} target="_blank" rel="noreferrer">View on map</a>
+                  : "Not set"}
+              </p>
               <p className="adm-owner">
                 Owner: {p.owner_name} · {p.owner_email}{p.owner_phone ? ` · ${p.owner_phone}` : ""}
               </p>

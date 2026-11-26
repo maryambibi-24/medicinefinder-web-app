@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import DashShell from "../components/DashShell";
+import LocationBar from "../components/LocationBar";
+import { LazyMapView } from "../components/LazyMap";
 import api from "../api";
 import { ago, isOpenNow, money, stockStatus } from "../utils";
+import { coord, directionsLink, formatKm, useMyLocation } from "../location";
 import "./search.css";
 
 const time = (t) => (t ? t.slice(0, 5) : "");
@@ -11,16 +14,26 @@ export default function MedicineDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
+  const [loc, setLoc] = useMyLocation();
   const city = params.get("city") || "";
+  const sort = loc && params.get("sort") !== "price" ? "nearest" : "price";
 
   const [cities, setCities] = useState([]);
   const [res, setRes] = useState({ key: "", data: null, error: "" });
-  const key = `${id}|${city}`;
+  const key = `${id}|${city}|${sort}|${loc?.lat}|${loc?.lng}`;
   const loading = res.key !== key;
+
+  const update = (changes) => {
+    const next = new URLSearchParams(params);
+    Object.entries(changes).forEach(([k, v]) => (v ? next.set(k, v) : next.delete(k)));
+    setParams(next, { replace: true });
+  };
 
   useEffect(() => {
     let alive = true;
-    api.get(`/search/medicine/${id}`, { params: { city } })
+    api.get(`/search/medicine/${id}`, {
+      params: { city, sort, lat: loc ? coord(loc.lat) : undefined, lng: loc ? coord(loc.lng) : undefined },
+    })
       .then(({ data }) => alive && setRes({ key, data, error: "" }))
       .catch((err) => {
         if (!alive) return;
@@ -31,7 +44,8 @@ export default function MedicineDetails() {
         setRes({ key, data: null, error: msg });
       });
     return () => { alive = false; };
-  }, [key, id, city, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   useEffect(() => {
     api.get("/search/cities").then(({ data }) => setCities(data)).catch(() => {});
@@ -42,8 +56,15 @@ export default function MedicineDetails() {
   const alternatives = res.data?.alternatives || [];
   const noStock = !loading && !!med && !pharmacies.some((p) => p.quantity > 0);
   const cityQuery = city ? `?city=${encodeURIComponent(city)}` : "";
-  const cheapest = pharmacies.find((p) => p.quantity > 0)?.stock_id;
+  const cheapestId = pharmacies.filter((p) => p.quantity > 0).sort((a, b) => a.price - b.price)[0]?.stock_id;
   const back = `/search${city ? `?city=${encodeURIComponent(city)}` : ""}`;
+
+  const points = pharmacies
+    .filter((p) => p.latitude !== null && p.longitude !== null)
+    .map((p) => ({
+      id: p.stock_id, lat: p.latitude, lng: p.longitude, title: p.pharmacy_name,
+      text: `${money(p.price)} · ${stockStatus(p.quantity).label}`, tone: stockStatus(p.quantity).cls,
+    }));
 
   return (
     <DashShell tag="Customer">
@@ -59,16 +80,31 @@ export default function MedicineDetails() {
             <p className="dash-sub">{med.generic_name ? `${med.generic_name} · ` : ""}{med.form}</p>
           </div>
 
+          <LocationBar loc={loc} onChange={setLoc} />
+
           <div className="srch-row">
             <h2>Pharmacies with this medicine</h2>
-            <label className="srch-field srch-inline">
-              City
-              <select value={city} onChange={(e) => setParams(e.target.value ? { city: e.target.value } : {}, { replace: true })}>
-                <option value="">All cities</option>
-                {cities.map((c) => <option key={c}>{c}</option>)}
-              </select>
-            </label>
+            <div className="srch-controls">
+              {loc && (
+                <label className="srch-field srch-inline">
+                  Sort by
+                  <select value={sort} onChange={(e) => update({ sort: e.target.value })}>
+                    <option value="nearest">Nearest</option>
+                    <option value="price">Lowest price</option>
+                  </select>
+                </label>
+              )}
+              <label className="srch-field srch-inline">
+                City
+                <select value={city} onChange={(e) => update({ city: e.target.value })}>
+                  <option value="">All cities</option>
+                  {cities.map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </label>
+            </div>
           </div>
+
+          {points.length > 0 && <LazyMapView points={points} me={loc} />}
 
           {!pharmacies.length && !loading && (
             <div className="dash-card srch-empty">
@@ -81,12 +117,18 @@ export default function MedicineDetails() {
             {pharmacies.map((p) => {
               const st = stockStatus(p.quantity);
               const open = isOpenNow(p.opening_time, p.closing_time);
-              const maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.pharmacy_name}, ${p.address}, ${p.city}`)}`;
+              const maps = p.latitude !== null
+                ? directionsLink(p.latitude, p.longitude)
+                : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${p.pharmacy_name}, ${p.address}, ${p.city}`)}`;
               return (
                 <article className={`srch-ph${p.quantity === 0 ? " out" : ""}`} key={p.stock_id}>
                   <div className="srch-info">
-                    <h2>{p.pharmacy_name}{p.stock_id === cheapest && <span className="dash-badge ok srch-best">Lowest price</span>}</h2>
+                    <h2>
+                      {p.pharmacy_name}
+                      {p.stock_id === cheapestId && <span className="dash-badge ok srch-best">Lowest price</span>}
+                    </h2>
                     <p>{p.address}, {p.city}</p>
+                    {p.distance_km !== null && <p className="srch-dist"><b>{formatKm(p.distance_km)}</b> away</p>}
                     <p className="srch-meta">
                       {open !== null && <span className={`srch-open ${open ? "yes" : "no"}`}>{open ? "Open now" : "Closed now"}</span>}
                       {p.opening_time && <> {time(p.opening_time)} to {time(p.closing_time)} · </>}
@@ -139,6 +181,7 @@ export default function MedicineDetails() {
                         </span>
                         {" "}In stock at {a.pharmacy_count} {a.pharmacy_count === 1 ? "pharmacy" : "pharmacies"}
                       </p>
+                      {a.nearest_km !== null && <p className="srch-dist">Nearest: <b>{formatKm(a.nearest_km)} away</b></p>}
                     </div>
                     <div className="srch-price"><small>From</small><b>{money(a.min_price)}</b></div>
                   </Link>

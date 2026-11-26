@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import AuthLayout from "../components/AuthLayout";
 import useNoAutofill from "../hooks/useNoAutofill";
+import { LazyMapPicker } from "../components/LazyMap";
 
 const API = "http://localhost:5000/api/auth";
 const PHARMACY_STEPS = ["Pharmacy details", "We verify your license", "Go live and update stock"];
@@ -24,6 +25,7 @@ export default function Register() {
   const [submitted, setSubmitted] = useState(false); // pharmacy waiting for verification
   const [armed, setArmed] = useState(false); // fields are read-only until clicked (stops browser auto-fill)
 
+  const [point, setPoint] = useState(null); // pharmacy position on the map
   const formRef = useRef(null);
   useNoAutofill(formRef, () => setForm(empty));
 
@@ -53,6 +55,10 @@ export default function Register() {
       setError("Fill in all the pharmacy details.");
       return;
     }
+    if (isPharmacy && !point) {
+      setError("Choose your pharmacy location on the map.");
+      return;
+    }
     if (!agree) {
       setError("Please agree to the Terms and Privacy Policy.");
       return;
@@ -72,6 +78,8 @@ export default function Register() {
             city: form.city,
             openingTime: form.openingTime,
             closingTime: form.closingTime,
+            latitude: point?.lat,
+            longitude: point?.lng,
           }
         : undefined,
     };
@@ -151,6 +159,9 @@ export default function Register() {
               {field("Opening time", "openingTime", { type: "time" })}
               {field("Closing time", "closingTime", { type: "time" })}
             </div>
+            <p className="section-title">Pharmacy location</p>
+            <p className="note">Customers use this to see how far you are. Click the map to place the pin, or use your current location if you are at the pharmacy.</p>
+            <LazyMapPicker value={point} onChange={setPoint} height={280} />
             <p className="section-title">Owner account</p>
           </>
         )}

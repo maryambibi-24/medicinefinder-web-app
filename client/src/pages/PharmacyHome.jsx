@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DashShell from "../components/DashShell";
+import PharmacyLocation from "../components/PharmacyLocation";
 
 const API = "http://localhost:5000/api/pharmacy";
 const time = (t) => (t ? t.slice(0, 5) : "—");
@@ -110,6 +111,9 @@ export default function PharmacyHome() {
           </div>
           <div className="dash-card"><h2>Your pharmacy</h2>{facts}</div>
         </>
+      )}
+      {info && status !== "rejected" && (
+        <PharmacyLocation latitude={info.latitude} longitude={info.longitude} onSaved={() => load()} />
       )}
     </DashShell>
   );

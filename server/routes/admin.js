@@ -10,14 +10,18 @@ router.get("/pharmacies", async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT p.id, p.name, p.license_number, p.address, p.city,
-              p.opening_time, p.closing_time, p.is_verified,
+              p.opening_time, p.closing_time, p.latitude, p.longitude, p.is_verified,
               p.rejection_reason, p.reviewed_at, p.created_at,
               u.name AS owner_name, u.email AS owner_email, u.phone AS owner_phone
          FROM pharmacies p
          JOIN users u ON u.id = p.user_id
         ORDER BY p.created_at DESC`
     );
-    res.json(rows);
+    res.json(rows.map((r) => ({
+      ...r,
+      latitude: r.latitude === null ? null : Number(r.latitude),
+      longitude: r.longitude === null ? null : Number(r.longitude),
+    })));
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });

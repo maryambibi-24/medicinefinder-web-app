@@ -21,6 +21,15 @@ router.post("/register", async (req, res) => {
   }
 
   const p = pharmacy || {};
+  const lat = Number(p.latitude);
+  const lng = Number(p.longitude);
+  const hasPlace =
+    p.latitude !== undefined && p.latitude !== null && p.latitude !== "" &&
+    p.longitude !== undefined && p.longitude !== null && p.longitude !== "" &&
+    Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  if (isPharmacy && !hasPlace) {
+    return res.status(400).json({ error: "Choose your pharmacy location on the map" });
+  }
   if (isPharmacy && (!p.name?.trim() || !p.licenseNumber?.trim() || !p.address?.trim() || !p.city?.trim())) {
     return res.status(400).json({ error: "Fill in all the pharmacy details" });
   }
@@ -39,8 +48,8 @@ router.post("/register", async (req, res) => {
     if (isPharmacy) {
       await conn.query(
         `INSERT INTO pharmacies
-           (user_id, name, license_number, address, city, opening_time, closing_time)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+           (user_id, name, license_number, address, city, opening_time, closing_time, latitude, longitude)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           result.insertId,
           p.name.trim(),
@@ -49,6 +58,8 @@ router.post("/register", async (req, res) => {
           p.city.trim(),
           p.openingTime || null,
           p.closingTime || null,
+          lat,
+          lng,
         ]
       );
     }

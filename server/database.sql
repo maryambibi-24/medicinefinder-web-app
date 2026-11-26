@@ -1,9 +1,4 @@
--- =====================================================
--- MedFinder database
--- Run this file once to create the database, the tables
--- and the admin account. It is safe to run again: it
--- skips what exists and adds anything that is missing.
--- =====================================================
+
 
 CREATE DATABASE IF NOT EXISTS medfinder
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -32,6 +27,8 @@ CREATE TABLE IF NOT EXISTS pharmacies (
   license_number VARCHAR(60) NOT NULL UNIQUE,
   address VARCHAR(255) NOT NULL,
   city VARCHAR(80) NOT NULL,
+  latitude DECIMAL(9,6) NULL,
+  longitude DECIMAL(9,6) NULL,
   opening_time TIME NULL,
   closing_time TIME NULL,
   is_verified TINYINT(1) NOT NULL DEFAULT 0,
@@ -50,6 +47,17 @@ PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
 SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pharmacies' AND COLUMN_NAME = 'reviewed_at');
 SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN reviewed_at TIMESTAMP NULL', 'SELECT 1');
+PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
+
+-- Map position of each pharmacy (used for "0.8 km away" and the map)
+SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
+           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pharmacies' AND COLUMN_NAME = 'latitude');
+SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN latitude DECIMAL(9,6) NULL', 'SELECT 1');
+PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
+
+SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
+           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pharmacies' AND COLUMN_NAME = 'longitude');
+SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN longitude DECIMAL(9,6) NULL', 'SELECT 1');
 PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
 
 -- Medicine catalog shared by all pharmacies (a medicine exists once here)
