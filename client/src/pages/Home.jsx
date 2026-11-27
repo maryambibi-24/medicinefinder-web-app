@@ -38,9 +38,9 @@ export default function Home() {
             <h3>Paracetamol 500 mg</h3>
             <p className="demo-sub">Tablet · 3 pharmacies listed</p>
             <ul>
-              <li><b>City Care Pharmacy</b><span className="dash-badge ok">In stock</span><small>Open until 11 pm</small><span className="demo-price">Rs 45</span></li>
-              <li><b>Green Cross Pharmacy</b><span className="dash-badge wait">Low stock</span><small>Open until 9 pm</small><span className="demo-price">Rs 48</span></li>
-              <li><b>Health Plus Pharmacy</b><span className="dash-badge no">Out of stock</span><small>Closed now</small><span className="demo-price">—</span></li>
+              <li><b>City Care Pharmacy</b><span className="dash-badge ok">In stock</span><small>0.8 km away · Open until 11 pm</small><span className="demo-price">Rs 45</span></li>
+              <li><b>Green Cross Pharmacy</b><span className="dash-badge wait">Low stock</span><small>2.1 km away · Open until 9 pm</small><span className="demo-price">Rs 48</span></li>
+              <li><b>Health Plus Pharmacy</b><span className="dash-badge no">Out of stock</span><small>3.4 km away · Closed now</small><span className="demo-price">—</span></li>
             </ul>
             <p className="demo-note">Example only. Real results show pharmacies in your city.</p>
           </aside>
@@ -58,7 +58,7 @@ export default function Home() {
               <ul className="ticks">
                 <li>Search by brand or generic name</li>
                 <li>See stock, price and opening hours</li>
-                <li>Filter by city and sort by lowest price</li>
+                <li>Filter by city or distance and sort by price</li>
               </ul>
               <Link className="site-btn solid" to="/users">See what you get</Link>
             </div>

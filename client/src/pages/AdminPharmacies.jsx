@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import DashShell from "../components/DashShell";
 import "./admin.css";
+import { API_BASE } from "../api";
 
-const API = "http://localhost:5000/api/admin";
+const API = `${API_BASE}/admin`;
 // is_verified: 0 = waiting, 1 = approved, 2 = rejected
 const TABS = [
   { key: 0, label: "Pending" },
@@ -100,10 +101,10 @@ export default function AdminPharmacies() {
               <p>{p.address}, {p.city}</p>
               <p>Open {time(p.opening_time)} to {time(p.closing_time)}</p>
               <p>
-                Location:{" "}
-                {p.latitude !== null
-                  ? <a href={`https://www.google.com/maps?q=${p.latitude},${p.longitude}`} target="_blank" rel="noreferrer">View on map</a>
-                  : "Not set"}
+                Map pin:{" "}
+                {p.latitude !== null && p.longitude !== null
+                  ? <a href={`https://www.openstreetmap.org/?mlat=${p.latitude}&mlon=${p.longitude}#map=17/${p.latitude}/${p.longitude}`} target="_blank" rel="noreferrer">View on map</a>
+                  : "not set"}
               </p>
               <p className="adm-owner">
                 Owner: {p.owner_name} · {p.owner_email}{p.owner_phone ? ` · ${p.owner_phone}` : ""}

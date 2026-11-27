@@ -21,9 +21,10 @@ export default function ForUsers() {
           <div className="feat">
             <div><b>Search by name</b><p>Type a brand like Panadol or a generic name like paracetamol. Results update as you type.</p></div>
             <div><b>See stock and price</b><p>Each result shows whether a pharmacy has it in stock, low on stock, or out, with the price.</p></div>
+            <div><b>Find what is nearby</b><p>Share your location to see how far each pharmacy is, filter by distance and see them on a map.</p></div>
             <div><b>Filter your results</b><p>Pick your city, show only medicine in stock, or sort by lowest price.</p></div>
             <div><b>Check opening hours</b><p>See if a pharmacy is open now before you travel.</p></div>
-            <div><b>Reserve for pickup</b><p>Hold medicine at a pharmacy until you arrive.</p><span className="soon">Coming soon</span></div>
+            <div><b>Reserve for pickup</b><p>Choose how many and how long to hold it. A countdown shows how long you have left to collect.</p></div>
             <div><b>Urgent requests</b><p>Ask nearby pharmacies when you cannot find a medicine.</p><span className="soon">Coming soon</span></div>
           </div>
         </div>

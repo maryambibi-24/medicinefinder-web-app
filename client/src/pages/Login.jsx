@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthLayout from "../components/AuthLayout";
 import useNoAutofill from "../hooks/useNoAutofill";
+import { API_BASE } from "../api";
 
-const API = "http://localhost:5000/api/auth";
+const API = `${API_BASE}/auth`;
 // Everyone logs in here, then goes to their own dashboard
 const HOME = { user: "/dashboard", pharmacy: "/pharmacy", admin: "/admin" };
 

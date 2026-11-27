@@ -11,6 +11,7 @@ export default function DashShell({ tag, children }) {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("myLocation"); // do not keep a location on a shared device
     navigate("/login");
   };
 

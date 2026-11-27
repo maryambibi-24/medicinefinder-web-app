@@ -73,6 +73,7 @@ export default function SiteLayout() {
           </div>
           <ul>
             {LINKS.map((l) => <li key={l.to}><Link to={l.to}>{l.label}</Link></li>)}
+            <li><Link to="/status">System status</Link></li>
           </ul>
           <p className="site-foot-help">
             Need help? <a href="mailto:support@medfinder.example">support@medfinder.example</a>

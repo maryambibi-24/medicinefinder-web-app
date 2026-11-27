@@ -2,6 +2,7 @@
 const router = require("express").Router();
 const db = require("../db");
 const { auth } = require("../middleware/auth");
+const { toNum } = require("../geo");
 
 router.use(auth(["admin"]));
 
@@ -17,11 +18,7 @@ router.get("/pharmacies", async (req, res) => {
          JOIN users u ON u.id = p.user_id
         ORDER BY p.created_at DESC`
     );
-    res.json(rows.map((r) => ({
-      ...r,
-      latitude: r.latitude === null ? null : Number(r.latitude),
-      longitude: r.longitude === null ? null : Number(r.longitude),
-    })));
+    res.json(rows.map((r) => ({ ...r, latitude: toNum(r.latitude, 6), longitude: toNum(r.longitude, 6) })));
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Server error" });

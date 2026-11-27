@@ -1,4 +1,9 @@
-
+-- =====================================================
+-- MedFinder database
+-- Run this file once to create the database, the tables
+-- and the admin account. It is safe to run again: it
+-- skips what exists and adds anything that is missing.
+-- =====================================================
 
 CREATE DATABASE IF NOT EXISTS medfinder
   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -27,10 +32,10 @@ CREATE TABLE IF NOT EXISTS pharmacies (
   license_number VARCHAR(60) NOT NULL UNIQUE,
   address VARCHAR(255) NOT NULL,
   city VARCHAR(80) NOT NULL,
-  latitude DECIMAL(9,6) NULL,
-  longitude DECIMAL(9,6) NULL,
   opening_time TIME NULL,
   closing_time TIME NULL,
+  latitude DECIMAL(9,6) NULL,
+  longitude DECIMAL(9,6) NULL,
   is_verified TINYINT(1) NOT NULL DEFAULT 0,
   rejection_reason VARCHAR(255) NULL,
   reviewed_at TIMESTAMP NULL,
@@ -49,15 +54,10 @@ SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
 SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN reviewed_at TIMESTAMP NULL', 'SELECT 1');
 PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
 
--- Map position of each pharmacy (used for "0.8 km away" and the map)
+-- Map position of each pharmacy (used for "nearby" search). Stays empty until the pharmacy sets a pin.
 SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pharmacies' AND COLUMN_NAME = 'latitude');
-SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN latitude DECIMAL(9,6) NULL', 'SELECT 1');
-PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
-
-SET @c := (SELECT COUNT(*) FROM information_schema.COLUMNS
-           WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pharmacies' AND COLUMN_NAME = 'longitude');
-SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN longitude DECIMAL(9,6) NULL', 'SELECT 1');
+SET @q := IF(@c = 0, 'ALTER TABLE pharmacies ADD COLUMN latitude DECIMAL(9,6) NULL, ADD COLUMN longitude DECIMAL(9,6) NULL', 'SELECT 1');
 PREPARE s FROM @q; EXECUTE s; DEALLOCATE PREPARE s;
 
 -- Medicine catalog shared by all pharmacies (a medicine exists once here)
@@ -84,6 +84,30 @@ CREATE TABLE IF NOT EXISTS stock (
   INDEX idx_medicine (medicine_id),
   FOREIGN KEY (pharmacy_id) REFERENCES pharmacies(id) ON DELETE CASCADE,
   FOREIGN KEY (medicine_id) REFERENCES medicines(id) ON DELETE CASCADE
+);
+
+-- Reservations: medicine a customer holds for pickup for a short time
+CREATE TABLE IF NOT EXISTS reservations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  pharmacy_id INT NOT NULL,
+  medicine_id INT NOT NULL,
+  stock_id INT NULL,
+  quantity INT NOT NULL,
+  unit_price DECIMAL(10,2) NOT NULL,
+  hold_minutes INT NOT NULL,
+  expires_at DATETIME NOT NULL,
+  status ENUM('active','collected','cancelled','expired') NOT NULL DEFAULT 'active',
+  cancelled_by ENUM('customer','pharmacy','system') NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_res_user (user_id, status),
+  INDEX idx_res_pharmacy (pharmacy_id, status),
+  INDEX idx_res_expiry (status, expires_at),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (pharmacy_id) REFERENCES pharmacies(id) ON DELETE CASCADE,
+  FOREIGN KEY (medicine_id) REFERENCES medicines(id) ON DELETE CASCADE,
+  FOREIGN KEY (stock_id) REFERENCES stock(id) ON DELETE SET NULL
 );
 
 -- A few common medicines so the suggestions list is not empty (sample data)

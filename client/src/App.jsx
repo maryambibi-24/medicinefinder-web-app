@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import ForUsers from "./pages/ForUsers";
 import ForPharmacies from "./pages/ForPharmacies";
 import HowItWorks from "./pages/HowItWorks";
+import Status from "./pages/Status";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -12,6 +13,7 @@ import AdminPharmacies from "./pages/AdminPharmacies";
 import PharmacyStock from "./pages/PharmacyStock";
 import SearchMedicine from "./pages/SearchMedicine";
 import MedicineDetails from "./pages/MedicineDetails";
+import MyReservations from "./pages/MyReservations";
 
 // Only lets signed-in people in. If "role" is given, only that role may enter.
 function Protected({ role, children }) {
@@ -30,12 +32,14 @@ export default function App() {
         <Route path="/users" element={<ForUsers />} />
         <Route path="/pharmacies" element={<ForPharmacies />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/status" element={<Status />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Protected role="user"><Dashboard /></Protected>} />
       <Route path="/search" element={<Protected role="user"><SearchMedicine /></Protected>} />
       <Route path="/medicine/:id" element={<Protected role="user"><MedicineDetails /></Protected>} />
+      <Route path="/reservations" element={<Protected role="user"><MyReservations /></Protected>} />
       <Route path="/pharmacy" element={<Protected role="pharmacy"><PharmacyHome /></Protected>} />
       <Route path="/pharmacy/stock" element={<Protected role="pharmacy"><PharmacyStock /></Protected>} />
       <Route path="/admin" element={<Protected role="admin"><AdminPharmacies /></Protected>} />

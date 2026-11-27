@@ -1,0 +1,45 @@
+/* Reservations: form, countdown and lists */
+.rsv-form { background: #fff; border: 2px solid #1d4ed8; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; font-family: Inter, system-ui, sans-serif; color: #0b2a55; }
+.rsv-form h3 { margin: 0; font-size: 18px; }
+.rsv-form p { margin: 0; }
+.rsv-fields { display: flex; gap: 16px; flex-wrap: wrap; }
+.rsv-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; min-width: 180px; flex: 1; }
+.rsv-field input, .rsv-field select { min-height: 44px; padding: 8px 12px; font: 400 16px Inter, system-ui, sans-serif; color: #0b2a55; background: #fff; border: 1px solid #94a3b8; border-radius: 10px; }
+.rsv-field input:focus-visible, .rsv-field select:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 2px; border-color: #1d4ed8; }
+.rsv-field small { font-weight: 400; color: #475569; font-size: 12.5px; }
+.rsv-total { font-size: 15px; }
+.rsv-note { color: #475569; font-size: 13px; line-height: 1.5; }
+.rsv-error { background: #fee2e2; color: #991b1b; border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.rsv-notice { background: #e6efff; color: #0b2a55; border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+.rsv-done { border-color: #16a34a; }
+.rsv-bigclock { display: flex; align-items: baseline; gap: 12px; }
+.rsv-bigclock span:first-child { color: #475569; font-size: 14px; }
+.rsv-bigclock .rsv-clock { font-size: 32px; }
+
+.rsv-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.rsv-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 18px; border: 1px solid #1d4ed8; border-radius: 10px; background: #1d4ed8; color: #fff; font: 600 14px Inter, system-ui, sans-serif; text-decoration: none; cursor: pointer; transition: background-color 0.2s; }
+.rsv-btn:hover:not(:disabled) { background: #1e40af; }
+.rsv-btn.ghost { background: #fff; color: #1d4ed8; }
+.rsv-btn.ghost:hover:not(:disabled) { background: #e6efff; }
+.rsv-btn.danger { background: #b91c1c; border-color: #b91c1c; }
+.rsv-btn.danger:hover:not(:disabled) { background: #991b1b; }
+.rsv-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.rsv-btn:focus-visible, .rsv-open:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 2px; }
+.rsv-open { min-height: 44px; padding: 8px 16px; margin-top: 6px; border: 1px solid #1d4ed8; border-radius: 10px; background: #fff; color: #1d4ed8; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; }
+.rsv-open:hover { background: #e6efff; }
+
+/* The countdown: tabular digits so the numbers do not jiggle */
+.rsv-clock { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 26px; color: #166534; letter-spacing: 0.02em; }
+.rsv-clock.low { color: #b91c1c; }
+.rsv-label { color: #475569; font-size: 13px; }
+
+/* A reservation I am holding */
+.rsv-card { background: #fff; border: 1px solid #d5dde8; border-left: 4px solid #1d4ed8; border-radius: 14px; padding: 18px 20px; display: flex; gap: 20px; justify-content: space-between; flex-wrap: wrap; }
+.rsv-card .srch-info { flex: 1 1 280px; }
+.rsv-side { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; min-width: 200px; }
+
+/* Pharmacy list */
+.rsv-rows { display: flex; flex-direction: column; margin-top: 12px; }
+.rsv-row { display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; padding: 14px 0; border-top: 1px solid #e2e8f0; }
+.rsv-row p { margin: 4px 0 0; color: #475569; font-size: 14px; }
+.rsv-row em { color: #475569; font-size: 13px; }

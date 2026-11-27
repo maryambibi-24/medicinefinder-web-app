@@ -1,48 +1,59 @@
 import { useState } from "react";
 import api from "../api";
-import { LazyMapPicker } from "./LazyMap";
+import PinPicker from "./PinPicker";
+import "./geo.css";
 
-// Pharmacy dashboard card: set or change where the shop is on the map
-export default function PharmacyLocation({ latitude, longitude, onSaved }) {
-  const hasSaved = latitude !== null && latitude !== undefined && longitude !== null && longitude !== undefined;
-  const [point, setPoint] = useState(hasSaved ? { lat: latitude, lng: longitude } : null);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
+// Pharmacy dashboard card: place or move the pharmacy's pin on the map
+export default function PharmacyLocation({ latitude, longitude }) {
+  const start = latitude !== null && longitude !== null ? { lat: latitude, lng: longitude } : null;
+  const [pin, setPin] = useState(start);
+  const [saved, setSaved] = useState(start);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState({ type: "", text: "" });
 
-  const changed = !!point && (!hasSaved || Math.abs(point.lat - latitude) > 1e-6 || Math.abs(point.lng - longitude) > 1e-6);
+  const same = (a, b) => (!a && !b) || (a && b && a.lat === b.lat && a.lng === b.lng);
+  const changed = !same(pin, saved);
 
   const save = async () => {
-    setSaving(true);
-    setMessage({ type: "", text: "" });
+    setBusy(true);
+    setMsg({ type: "", text: "" });
     try {
-      await api.put("/pharmacy/location", { latitude: point.lat, longitude: point.lng });
-      setMessage({ type: "ok", text: "Location saved. Customers can now see how far you are." });
-      if (onSaved) onSaved();
+      const body = pin
+        ? { latitude: Number(pin.lat.toFixed(6)), longitude: Number(pin.lng.toFixed(6)) }
+        : { latitude: null, longitude: null };
+      await api.put("/pharmacy/me/location", body);
+      setSaved(pin ? { lat: body.latitude, lng: body.longitude } : null);
+      setMsg({ type: "ok", text: pin ? "Location saved." : "Location removed." });
     } catch (err) {
-      setMessage({ type: "error", text: err.response?.data?.error || "Could not save the location." });
+      const text = !err.response
+        ? "Cannot reach the server. Check that the backend is running."
+        : err.response.data?.error || "Could not save the location. Restart the server after updating, then try again.";
+      setMsg({ type: "err", text });
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   };
 
   return (
-    <div className="dash-card">
-      <h2>Shop location</h2>
-      <p className="dash-sub">Customers see how far your pharmacy is from them, and find you on the map.</p>
-      {!hasSaved && (
-        <div className="srch-banner" role="status">
-          <b>Your location is not set yet.</b> Customers cannot see how far you are until you save it.
-        </div>
-      )}
-      <div style={{ marginTop: 12 }}>
-        <LazyMapPicker value={point} onChange={setPoint} height={300} />
+    <div className="dash-card geo-card">
+      <h2>Location on the map</h2>
+      <p className="dash-sub">
+        Customers see how far away you are and can search by distance. Place the pin on your shop entrance.
+      </p>
+
+      {!saved && <div className="geo-notice" role="status" style={{ marginTop: 12 }}>
+        Your pharmacy has no pin yet, so customers cannot find you by distance.
+      </div>}
+
+      <PinPicker value={pin} onChange={(v) => { setPin(v); setMsg({ type: "", text: "" }); }} height={300} />
+
+      <div className="geo-row" style={{ marginTop: 12 }}>
+        <button type="button" className="geo-btn" onClick={save} disabled={busy || !changed}>
+          {busy ? "Saving…" : "Save location"}
+        </button>
+        {msg.type === "ok" && <p className="geo-saved" role="status">{msg.text}</p>}
+        {msg.type === "err" && <p className="geo-msg" role="alert">{msg.text}</p>}
       </div>
-      {message.text && (
-        <div className={message.type === "ok" ? "stk-notice" : "stk-error"} role="status" style={{ marginTop: 12 }}>{message.text}</div>
-      )}
-      <button className="dash-btn" onClick={save} disabled={saving || !changed}>
-        {saving ? "Saving…" : "Save location"}
-      </button>
     </div>
   );
 }

@@ -3,8 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import DashShell from "../components/DashShell";
 import PharmacyLocation from "../components/PharmacyLocation";
+import PharmacyReservations from "../components/PharmacyReservations";
+import { API_BASE } from "../api";
 
-const API = "http://localhost:5000/api/pharmacy";
+const API = `${API_BASE}/pharmacy`;
 const time = (t) => (t ? t.slice(0, 5) : "—");
 const day = (d) => (d ? new Date(d).toLocaleDateString() : "—");
 
@@ -107,14 +109,14 @@ export default function PharmacyHome() {
           <div className="dash-grid">
             <Link className="dash-tile" to="/pharmacy/stock"><b>Stock</b><span>Add medicines, prices and quantities.</span></Link>
             <div className="dash-tile"><b>Urgent requests</b><span>Reply to people searching nearby.</span></div>
-            <div className="dash-tile"><b>Reservations</b><span>Medicine held for pickup and deliveries.</span></div>
+            <a className="dash-tile" href="#reservations"><b>Reservations</b><span>Medicine customers are holding for pickup.</span></a>
           </div>
+          <PharmacyReservations />
           <div className="dash-card"><h2>Your pharmacy</h2>{facts}</div>
         </>
       )}
-      {info && status !== "rejected" && (
-        <PharmacyLocation latitude={info.latitude} longitude={info.longitude} onSaved={() => load()} />
-      )}
+
+      {info && status !== "rejected" && <PharmacyLocation latitude={info.latitude} longitude={info.longitude} />}
     </DashShell>
   );
 }

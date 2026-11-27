@@ -63,21 +63,3 @@
 .srch-altlink { color: #1d4ed8; font-weight: 600; font-size: 13px; }
 .srch-card:hover .srch-altlink { text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .srch-banner { animation: none; } }
-
-/* Location bar and distances */
-.loc-bar { display: flex; flex-direction: column; gap: 14px; }
-.loc-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
-.loc-text { display: flex; flex-direction: column; gap: 2px; }
-.loc-text span { color: #475569; font-size: 13px; }
-.loc-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.loc-btn { min-height: 40px; padding: 8px 14px; border-radius: 10px; border: 1px solid #1d4ed8; background: #fff; color: #1d4ed8; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; transition: background-color 0.2s, transform 0.15s; }
-.loc-btn.primary { background: #1d4ed8; color: #fff; }
-.loc-btn:hover:not(:disabled) { background: #e6efff; transform: translateY(-1px); }
-.loc-btn.primary:hover:not(:disabled) { background: #1e40af; }
-.loc-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.loc-btn:focus-visible, .loc-radius select:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 2px; }
-.loc-radius { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
-.loc-radius select { min-height: 40px; padding: 6px 10px; border: 1px solid #94a3b8; border-radius: 10px; font: 400 14px Inter, system-ui, sans-serif; color: #0b2a55; background: #fff; }
-.srch-dist { color: #1d4ed8; font-weight: 600; }
-.srch-dist b { font-weight: 700; }
-@media (prefers-reduced-motion: reduce) { .loc-btn:hover:not(:disabled) { transform: none; } }

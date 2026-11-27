@@ -1,29 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DashShell from "../components/DashShell";
-import LocationBar from "../components/LocationBar";
+import NearYou from "../components/NearYou";
+import useMyLocation from "../hooks/useMyLocation";
+import { distanceLabel } from "../geo";
 import api from "../api";
 import { ago, money } from "../utils";
-import { coord, formatKm, useMyLocation } from "../location";
 import "./search.css";
 
 export default function SearchMedicine() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [loc, setLoc] = useMyLocation();
-
   const q = params.get("q") || "";
   const city = params.get("city") || "";
   const inStock = params.get("stock") === "1";
-  const radius = loc ? params.get("radius") || "" : "";
-  // With a location the list starts with the nearest pharmacies
-  const sort = params.get("sort") === "nearest" && !loc ? "name" : params.get("sort") || (loc ? "nearest" : "name");
+  const radius = params.get("radius") || "";
+  const [loc, setLoc] = useMyLocation();
+  const rawSort = params.get("sort") || "name";
+  const sort = rawSort === "nearest" && !loc ? "name" : rawSort; // "nearest" needs a location
 
   const [text, setText] = useState(q); // what is typed in the box
   const [cities, setCities] = useState([]);
   const [res, setRes] = useState({ key: "", items: [], error: "" });
 
-  const key = `${q}|${city}|${inStock}|${sort}|${radius}|${loc?.lat}|${loc?.lng}`;
+  const key = `${q}|${city}|${inStock}|${sort}|${loc?.lat}|${loc?.lng}|${radius}`;
   const loading = res.key !== key;
 
   const update = (changes) => {
@@ -52,11 +52,8 @@ export default function SearchMedicine() {
     let alive = true;
     api.get("/search", {
       params: {
-        q, city, sort,
-        inStock: inStock ? 1 : undefined,
-        lat: loc ? coord(loc.lat) : undefined,
-        lng: loc ? coord(loc.lng) : undefined,
-        radius: radius || undefined,
+        q, city, inStock: inStock ? 1 : undefined, sort,
+        lat: loc?.lat, lng: loc?.lng, radius: loc && radius ? radius : undefined,
       },
     })
       .then(({ data }) => alive && setRes({ key, items: data, error: "" }))
@@ -72,7 +69,12 @@ export default function SearchMedicine() {
     api.get("/search/cities").then(({ data }) => setCities(data)).catch(() => {});
   }, []);
 
-  const detailLink = (id) => `/medicine/${id}${city ? `?city=${encodeURIComponent(city)}` : ""}`;
+  const detailLink = (id) => {
+    const next = new URLSearchParams();
+    if (city) next.set("city", city);
+    if (loc && radius) next.set("radius", radius);
+    return `/medicine/${id}${next.toString() ? `?${next}` : ""}`;
+  };
 
   return (
     <DashShell tag="Customer">
@@ -99,11 +101,11 @@ export default function SearchMedicine() {
         </label>
         <label className="srch-field">
           Sort by
-          <select value={sort} onChange={(e) => update({ sort: e.target.value })}>
-            {loc && <option value="nearest">Nearest</option>}
+          <select value={sort} onChange={(e) => update({ sort: e.target.value === "name" ? "" : e.target.value })}>
             <option value="name">Name</option>
             <option value="price">Lowest price</option>
             <option value="recent">Recently updated</option>
+            {loc && <option value="nearest">Nearest</option>}
           </select>
         </label>
         <label className="srch-check">
@@ -112,23 +114,22 @@ export default function SearchMedicine() {
         </label>
       </div>
 
-      <LocationBar loc={loc} onChange={setLoc} radius={radius} onRadius={(r) => update({ radius: r })} />
+      <NearYou loc={loc} onLoc={setLoc} radius={radius} onRadius={(v) => update({ radius: v })} />
 
       <p className="dash-sub" aria-live="polite">
         {loading ? "Searching…" : res.error ? "" : q
           ? `${res.items.length} result${res.items.length === 1 ? "" : "s"} for “${q}”`
           : "Medicines available at pharmacies"}
-        {!loading && !res.error && radius ? ` within ${radius} km` : ""}
       </p>
 
       {res.error && <div className="srch-error" role="alert">{res.error}</div>}
 
       {!loading && !res.error && !res.items.length && (
         <div className="dash-card srch-empty">
-          <b>No medicine found{q ? ` for “${q}”` : ""}{radius ? ` within ${radius} km` : ""}.</b>
+          <b>No medicine found{q ? ` for “${q}”` : ""}.</b>
           <p className="dash-sub">
-            {radius
-              ? "Try a bigger distance, or choose Any distance."
+            {loc && radius
+              ? `Nothing found within ${radius} km. Try a larger distance, or clear it.`
               : "Try the generic name (for example “paracetamol”), check the spelling, or remove the filters."}
           </p>
         </div>
@@ -141,14 +142,12 @@ export default function SearchMedicine() {
               <h2>{m.name} <span>{m.strength}</span> <em>{m.form}</em></h2>
               {m.generic_name && <p>{m.generic_name}</p>}
               <p className="srch-meta">
+                {m.nearest_km !== null && <><span className="geo-dist">Nearest pharmacy: {distanceLabel(m.nearest_km)}</span>{" · "}</>}
                 {m.in_stock_count > 0
                   ? `In stock at ${m.in_stock_count} of ${m.pharmacy_count} pharmacies`
                   : `Listed at ${m.pharmacy_count} pharmacies`}
                 {" · "}updated {ago(m.last_updated)}
               </p>
-              {m.nearest_km !== null && (
-                <p className="srch-dist">Nearest in stock: <b>{formatKm(m.nearest_km)} away</b></p>
-              )}
             </div>
             <div className="srch-price">
               {m.min_price !== null
