@@ -4,6 +4,7 @@ import axios from "axios";
 import DashShell from "../components/DashShell";
 import PharmacyLocation from "../components/PharmacyLocation";
 import PharmacyReservations from "../components/PharmacyReservations";
+import PharmacyUrgent from "../components/PharmacyUrgent";
 import { API_BASE } from "../api";
 
 const API = `${API_BASE}/pharmacy`;
@@ -108,9 +109,10 @@ export default function PharmacyHome() {
           <p className="dash-sub"><span className="dash-badge ok">Verified</span> Your pharmacy is live and can appear in search.</p>
           <div className="dash-grid">
             <Link className="dash-tile" to="/pharmacy/stock"><b>Stock</b><span>Add medicines, prices and quantities.</span></Link>
-            <div className="dash-tile"><b>Urgent requests</b><span>Reply to people searching nearby.</span></div>
+            <a className="dash-tile" href="#urgent"><b>Urgent requests</b><span>Reply to people searching nearby.</span></a>
             <a className="dash-tile" href="#reservations"><b>Reservations</b><span>Medicine customers are holding for pickup.</span></a>
           </div>
+          <PharmacyUrgent />
           <PharmacyReservations />
           <div className="dash-card"><h2>Your pharmacy</h2>{facts}</div>
         </>

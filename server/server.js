@@ -7,6 +7,7 @@ const cors = require("cors");
 const db = require("./db");
 const { ensureSchema } = require("./lib/schema");
 const { expireReservations } = require("./lib/reservations");
+const { expireUrgentRequests } = require("./lib/urgent");
 
 // A stray error inside one request must never stop the whole server
 process.on("unhandledRejection", (err) => console.log("Unhandled error:", err));
@@ -21,6 +22,7 @@ app.use("/api/pharmacy", require("./routes/pharmacy"));
 app.use("/api/stock", require("./routes/stock"));
 app.use("/api/search", require("./routes/search"));
 app.use("/api/reservations", require("./routes/reservations"));
+app.use("/api/urgent", require("./routes/urgent"));
 
 app.get("/", (req, res) => res.send("MedFinder server is running"));
 
@@ -83,8 +85,10 @@ async function checkSetup() {
   }
 }
 
-// Every 30 seconds: holds that ran out are released and their stock returns
-setInterval(() => expireReservations().catch((err) => console.log("Expiry check failed:", err.code || err.message)), 30000);
+// Every 30 seconds: holds that ran out are released (stock returns) and old urgent requests are closed
+setInterval(() => {
+  Promise.all([expireReservations(), expireUrgentRequests()]).catch((err) => console.log("Expiry check failed:", err.code || err.message));
+}, 30000);
 
 const PORT = 5000;
 const server = app.listen(PORT, () => {

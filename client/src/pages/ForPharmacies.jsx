@@ -24,7 +24,7 @@ export default function ForPharmacies() {
             <div><b>Appear on the map</b><p>Place a pin on your shop so customers see how far you are and can get directions.</p></div>
             <div><b>Show your hours</b><p>Your opening and closing times appear next to your stock, including late-night hours.</p></div>
             <div><b>Reservations</b><p>See who is holding your medicine, mark it collected, or cancel. Holds that run out return to stock by themselves.</p></div>
-            <div><b>Urgent requests</b><p>Reply when someone nearby asks for a medicine you carry.</p><span className="soon">Coming soon</span></div>
+            <div><b>Urgent requests</b><p>See who nearby is looking for a medicine and answer with one tap: Available or Not available.</p></div>
           </div>
         </div>
       </section>

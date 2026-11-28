@@ -35,7 +35,7 @@ export default function PharmacyLocation({ latitude, longitude }) {
   };
 
   return (
-    <div className="dash-card geo-card">
+    <div className="dash-card geo-card" id="location">
       <h2>Location on the map</h2>
       <p className="dash-sub">
         Customers see how far away you are and can search by distance. Place the pin on your shop entrance.

@@ -110,6 +110,36 @@ CREATE TABLE IF NOT EXISTS reservations (
   FOREIGN KEY (stock_id) REFERENCES stock(id) ON DELETE SET NULL
 );
 
+-- Urgent requests: a customer asks pharmacies nearby, and each pharmacy answers
+CREATE TABLE IF NOT EXISTS urgent_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  medicine_name VARCHAR(150) NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  radius_km INT NOT NULL,
+  latitude DECIMAL(9,6) NULL,
+  longitude DECIMAL(9,6) NULL,
+  notified_count INT NOT NULL DEFAULT 0,
+  status ENUM('open','closed','expired') NOT NULL DEFAULT 'open',
+  expires_at DATETIME NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_urg_user (user_id, status),
+  INDEX idx_urg_open (status, expires_at),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS urgent_replies (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  request_id INT NOT NULL,
+  pharmacy_id INT NOT NULL,
+  answer ENUM('available','not_available') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_reply (request_id, pharmacy_id),
+  FOREIGN KEY (request_id) REFERENCES urgent_requests(id) ON DELETE CASCADE,
+  FOREIGN KEY (pharmacy_id) REFERENCES pharmacies(id) ON DELETE CASCADE
+);
+
 -- A few common medicines so the suggestions list is not empty (sample data)
 INSERT IGNORE INTO medicines (name, generic_name, form, strength) VALUES
   ('Panadol',   'Paracetamol',                 'Tablet',  '500 mg'),

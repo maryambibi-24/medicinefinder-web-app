@@ -36,4 +36,11 @@ function readPin(lat, lng) {
 
 const toNum = (v, digits) => (v === null || v === undefined ? null : Number(Number(v).toFixed(digits)));
 
-module.exports = { readLocation, distanceSql, readPin, toNum };
+// Straight-line distance between two points in km (same formula as distanceSql, for use in JavaScript)
+function haversineKm(aLat, aLng, bLat, bLng) {
+  const rad = (d) => (d * Math.PI) / 180;
+  const h = Math.sin(rad(bLat - aLat) / 2) ** 2 + Math.cos(rad(aLat)) * Math.cos(rad(bLat)) * Math.sin(rad(bLng - aLng) / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1, h)));
+}
+
+module.exports = { readLocation, distanceSql, readPin, toNum, haversineKm };

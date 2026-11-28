@@ -35,7 +35,7 @@ export default function Dashboard() {
       <div className="dash-grid">
         <Link className="dash-tile" to="/search"><b>Browse medicines</b><span>See what pharmacies have in stock.</span></Link>
         <Link className="dash-tile" to="/reservations"><b>My reservations</b><span>Medicine you are holding for pickup, with a countdown.</span></Link>
-        <div className="dash-tile"><b>Urgent request</b><span>Ask nearby pharmacies when you cannot find it. Coming soon.</span></div>
+        <Link className="dash-tile" to="/urgent"><b>Urgent request</b><span>Ask nearby pharmacies when you cannot find it.</span></Link>
       </div>
     </DashShell>
   );

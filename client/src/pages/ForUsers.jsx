@@ -25,7 +25,7 @@ export default function ForUsers() {
             <div><b>Filter your results</b><p>Pick your city, show only medicine in stock, or sort by lowest price.</p></div>
             <div><b>Check opening hours</b><p>See if a pharmacy is open now before you travel.</p></div>
             <div><b>Reserve for pickup</b><p>Choose how many and how long to hold it. A countdown shows how long you have left to collect.</p></div>
-            <div><b>Urgent requests</b><p>Ask nearby pharmacies when you cannot find a medicine.</p><span className="soon">Coming soon</span></div>
+            <div><b>Urgent requests</b><p>Cannot find a medicine? Choose a search radius and nearby pharmacies answer Available or Not available.</p></div>
           </div>
         </div>
       </section>
